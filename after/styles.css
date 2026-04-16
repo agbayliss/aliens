@@ -166,10 +166,10 @@ h1 .emoji { margin-right: 6px; }
 }
 
 
-.warnings h4 {
+.warnings-heading {
     font-size: 0.75rem;
     color: var(--danger);
-    font-family: var(--mono);
+    font-family: var(--sans);
     margin-bottom: 6px;
     display: flex;
     align-items: center;
@@ -962,7 +962,7 @@ pre .cm   { color: var(--comment); }
     margin-bottom: 14px;
 }
 
-.inline-detail-right .warnings h4 {
+.inline-detail-right .warnings-heading {
     font-family: var(--sans);
     font-size: 0.8125rem;
 }
@@ -1065,7 +1065,7 @@ pre .cm   { color: var(--comment); }
     margin-bottom: 3px;
 }
 
-.recap-card-info h1 {
+.recap-card-info h2 {
     font-size: 1.375rem;
     font-weight: 400;
     letter-spacing: -0.02em;
@@ -1441,7 +1441,7 @@ input[type="hidden"] {
 
     .recap-title-row { margin-bottom: 2px; }
 
-    .recap-card-info h1 { font-size: 1.25rem; }
+    .recap-card-info h2 { font-size: 1.25rem; }
 
     .recap-species { margin-bottom: 10px; }
 

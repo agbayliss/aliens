@@ -152,11 +152,7 @@
     <div id="successCard" class="success-card"></div>
 
     <!-- Error State (if alien ID is invalid) -->
-    <div id="errorCard" style="display:none" class="error-card">
-        <h2>Alien Not Found</h2>
-        <p>We couldn't find that species in our catalog. They may have already been adopted or wandered off.</p>
-        <a href="index.html" class="btn-primary">Back to Catalog</a>
-    </div>
+    <div id="errorCard"></div>
 
     <!-- Web MCP Section Header -->
     <div class="section-header">
@@ -383,7 +379,12 @@ if (!alien) {
     // Invalid or missing ID
     recapCard.style.display = 'none';
     formSection.style.display = 'none';
-    errorCard.style.display = 'block';
+    errorCard.className = 'error-card';
+    errorCard.innerHTML = `
+        <h2>Alien Not Found</h2>
+        <p>We couldn't find that species in our catalog. They may have already been adopted or wandered off.</p>
+        <a href="index.html" class="btn-primary">Back to Catalog</a>
+    `;
 } else {
     // Populate the recap card
     const illustrationFile = alien.name.toLowerCase().replace(/\s+/g, '-').replace(/\./g, '');
@@ -394,7 +395,7 @@ if (!alien) {
         </div>
         <div class="recap-card-info">
             <div class="recap-title-row">
-                <h1>${alien.name}</h1>
+                <h2>${alien.name}</h2>
                 <span class="recap-price">&#8372;${alien.price.toLocaleString()}</span>
             </div>
             <div class="recap-species">${alien.species}</div>
@@ -409,7 +410,7 @@ if (!alien) {
     if (alien.warnings && alien.warnings.length > 0) {
         document.getElementById('warningsSection').innerHTML = `
             <div class="warnings">
-                <h4><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1.5L10 9.5H1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="5.5" y1="4.5" x2="5.5" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5.5" cy="8" r="0.6" fill="currentColor"/></svg> Before submitting, please be aware:</h4>
+                <p class="warnings-heading"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1.5L10 9.5H1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="5.5" y1="4.5" x2="5.5" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5.5" cy="8" r="0.6" fill="currentColor"/></svg> Before submitting, please be aware:</p>
                 <ul>${alien.warnings.map(w => `<li>${w}</li>`).join('')}</ul>
             </div>
         `;
