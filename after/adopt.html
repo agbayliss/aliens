@@ -443,7 +443,9 @@ if (!alien) {
         }
 
         // Hide form, show success
+        formSection.innerHTML = '';
         formSection.style.display = 'none';
+        recapCard.innerHTML = '';
         recapCard.style.display = 'none';
         document.querySelector('.back-link').style.display = 'none';
         document.querySelector('.hero-content h1').textContent = 'Adoption Confirmed!';
