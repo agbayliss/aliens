@@ -25,31 +25,26 @@
         }
 
         .landing-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
         .landing-card-visual {
-            height: 200px;
-            background: linear-gradient(145deg, #1a1a2e, var(--bg));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid var(--border);
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(180, 180, 200, 0.15);
         }
 
-        .placeholder-shape {
-            width: 80px;
-            height: 80px;
-            border: 1px solid var(--border);
-            opacity: 0.4;
+        .landing-card-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
 
         .landing-card-body {
-            padding: 20px;
-            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -64,7 +59,6 @@
             font-size: 0.875rem;
             color: var(--text-muted);
             line-height: 1.6;
-            flex: 1;
         }
 
         .landing-card-body .btn-primary {
@@ -89,7 +83,7 @@
 
         <div class="landing-card">
             <div class="landing-card-visual">
-                <div class="placeholder-shape"></div>
+                <img src="before-img.png" alt="Before redesign screenshot">
             </div>
             <div class="landing-card-body">
                 <h2>Before</h2>
@@ -100,7 +94,7 @@
 
         <div class="landing-card">
             <div class="landing-card-visual">
-                <div class="placeholder-shape"></div>
+                <img src="after-img.png" alt="After redesign screenshot">
             </div>
             <div class="landing-card-body">
                 <h2>After</h2>
