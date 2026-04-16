@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/playground/favicon.svg">
+    <title>Adopt — Cosmic Companions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Strait&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section class="page-hero page-hero--slim">
+    <canvas class="hero-stars"></canvas>
+    <div class="hero-content">
+        <h1>Adoption Application</h1>
+    </div>
+    <svg class="hero-horizon" viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="rim-glow" x="-20%" y="-200%" width="140%" height="500%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        <path class="horizon-mask" d="M0,170 Q720,10 1440,170 L1440,200 L0,200 Z"/>
+        <path d="M0,170 Q720,10 1440,170" fill="none" stroke="rgba(255,249,178,0.6)" stroke-width="1.5" filter="url(#rim-glow)"/>
+    </svg>
+</section>
+
+<div class="container container--form">
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to catalog
+    </a>
+
+    <!-- Alien Recap (populated by JS) -->
+    <div id="recapCard" class="recap-card"></div>
+
+    <!-- Adoption Form -->
+    <div id="formSection" class="form-card">
+        <div class="form-card-header">
+            <div>
+                <h2>Complete Your Application</h2>
+                <p>Tell us about yourself so we can prepare your companion's care package.</p>
+            </div>
+        </div>
+
+        <!-- 
+            ═══════════════════════════════════════════════
+            DECLARATIVE WEBMCP FORM
+            
+            This form uses the declarative API with:
+            - toolname → names the tool
+            - tooldescription → tells agent what it does
+            - toolparamdescription → describes each field
+            
+            No toolautosubmit — the agent fills the form 
+            but the user must confirm by clicking submit.
+            ═══════════════════════════════════════════════
+        -->
+
+        <form
+            id="adoptionForm"
+            class="form-body"
+            toolname="submit_adoption_form"
+            tooldescription="Fill in the alien pet adoption form with the adopter's personal details. The alien being adopted is already selected. Fill in the adopter's full name, email, home environment type, experience level with exotic pets, and any optional notes. IMPORTANT: This tool ONLY fills in the form fields — it does NOT submit the form. After filling in the fields, tell the user to review the information and click the 'Submit Application' button themselves when they are ready."
+        >
+            <!-- Hidden field: alien ID (pre-filled from URL) -->
+            <input type="hidden" name="alien_id" id="alienIdField">
+
+            <!-- Name + Email -->
+            <div class="field-row">
+                <div class="field">
+                    <label>Full Name <span class="required">required</span></label>
+                    <input
+                        type="text"
+                        name="adopter_name"
+                        required
+                        placeholder="Jane Smith"
+                        toolparamdescription="The adopter's full legal name"
+                    >
+                </div>
+                <div class="field">
+                    <label>Email <span class="required">required</span></label>
+                    <input
+                        type="email"
+                        name="adopter_email"
+                        required
+                        placeholder="jane@example.com"
+                        toolparamdescription="The adopter's email for adoption confirmation and care updates"
+                    >
+                </div>
+            </div>
+
+            <!-- Home Environment + Experience -->
+            <div class="field-row">
+                <div class="field">
+                    <label>Home Environment <span class="required">required</span></label>
+                    <select
+                        name="home_environment"
+                        required
+                        toolparamdescription="Type of living space: apartment, house, space_station, or underwater_dome"
+                    >
+                        <option value="">Select...</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="house">House</option>
+                        <option value="space_station">Space Station</option>
+                        <option value="underwater_dome">Underwater Dome</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Experience with Exotic Pets <span class="required">required</span></label>
+                    <select
+                        name="experience_level"
+                        required
+                        toolparamdescription="Adopter's experience level: none (first time), some (1-2 exotic pets before), experienced (3+ exotic pets), or expert (professional handler)"
+                    >
+                        <option value="">Select your experience level...</option>
+                        <option value="none">First time — never had an exotic pet</option>
+                        <option value="some">Some — owned 1-2 exotic pets before</option>
+                        <option value="experienced">Experienced — owned 3+ exotic pets</option>
+                        <option value="expert">Expert — professional exotic pet handler</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="field">
+                <label>Notes for the Care Team</label>
+                <textarea
+                    name="notes"
+                    placeholder="Anything we should know? Allergies, other pets in the household, special accommodations..."
+                    toolparamdescription="Optional notes about the adopter's household, other pets, allergies, or special requirements"
+                ></textarea>
+            </div>
+
+            <!-- Warnings (populated by JS if applicable) -->
+            <div id="warningsSection"></div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
+        </form>
+    </div>
+
+    <!-- Success State (hidden until submission) -->
+    <div id="successCard" class="success-card"></div>
+
+    <!-- Error State (if alien ID is invalid) -->
+    <div id="errorCard" style="display:none" class="error-card">
+        <h2>Alien Not Found</h2>
+        <p>We couldn't find that species in our catalog. They may have already been adopted or wandered off.</p>
+        <a href="index.html" class="btn-primary">Back to Catalog</a>
+    </div>
+
+    <!-- Web MCP Section Header -->
+    <div class="section-header">
+        <h2>For Web MCP Users</h2>
+    </div>
+
+    <!-- Accordion: Agent Tool Log -->
+    <div class="accordion-item" id="logSection">
+        <button class="accordion-header" aria-expanded="false">
+            <svg class="accordion-caret" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h3>Agent Tool Log</h3>
+        </button>
+        <div class="accordion-body">
+            <div class="accordion-inner log-section">
+                <p class="log-desc">Real-time log of WebMCP tool invocations on this page.</p>
+                <div class="log-panel">
+                    <div class="log-toolbar">
+                        <span>declarative api — submit_adoption_form</span>
+                        <button class="log-clear" onclick="clearLog()">clear</button>
+                    </div>
+                    <div class="log-entries" id="logEntries">
+                        <div class="log-empty">No tool calls yet. Use an agent to interact with this form.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion: Declarative Tool Markup -->
+    <div class="accordion-item">
+        <button class="accordion-header" aria-expanded="false">
+            <svg class="accordion-caret" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h3>Declarative Tool Markup</h3>
+        </button>
+        <div class="accordion-body">
+            <div class="accordion-inner annotations">
+        <pre><span class="cm">&lt;!-- The entire tool is defined with HTML attributes — no JS needed --&gt;</span>
+
+<span class="tag">&lt;form</span>
+  <span class="attr">toolname</span>=<span class="val">"submit_adoption_form"</span>
+  <span class="attr">tooldescription</span>=<span class="val">"Fill in the alien pet adoption form with the adopter's personal details. The alien being adopted is already selected. Fill in the adopter's full name, email, home environment type, experience level with exotic pets, and any optional notes. IMPORTANT: This tool ONLY fills in the form fields — it does NOT submit the form. After filling in the fields, tell the user to review the information and click the 'Submit Application' button themselves when they are ready."</span>
+<span class="tag">&gt;</span>
+
+  <span class="tag">&lt;input</span>
+    type="hidden" name="alien_id"
+  <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;input</span>
+    type="text" name="adopter_name" required
+    placeholder="Jane Smith"
+    <span class="attr">toolparamdescription</span>=<span class="val">"The adopter's full legal name"</span>
+  <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;input</span>
+    type="email" name="adopter_email" required
+    placeholder="jane@example.com"
+    <span class="attr">toolparamdescription</span>=<span class="val">"The adopter's email for adoption confirmation and care updates"</span>
+  <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;select</span>
+    name="home_environment" required
+    <span class="attr">toolparamdescription</span>=<span class="val">"Type of living space: apartment, house, space_station, or underwater_dome"</span>
+  <span class="tag">&gt;</span>
+    <span class="tag">&lt;option</span> value=""<span class="tag">&gt;</span>Select...<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="apartment"<span class="tag">&gt;</span>Apartment<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="house"<span class="tag">&gt;</span>House<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="space_station"<span class="tag">&gt;</span>Space Station<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="underwater_dome"<span class="tag">&gt;</span>Underwater Dome<span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;/select&gt;</span>
+
+  <span class="tag">&lt;select</span>
+    name="experience_level" required
+    <span class="attr">toolparamdescription</span>=<span class="val">"Adopter's experience level: none (first time), some (1-2 exotic pets before), experienced (3+ exotic pets), or expert (professional handler)"</span>
+  <span class="tag">&gt;</span>
+    <span class="tag">&lt;option</span> value=""<span class="tag">&gt;</span>Select your experience level...<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="none"<span class="tag">&gt;</span>First time<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="some"<span class="tag">&gt;</span>Some — owned 1-2 exotic pets<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="experienced"<span class="tag">&gt;</span>Experienced — owned 3+<span class="tag">&lt;/option&gt;</span>
+    <span class="tag">&lt;option</span> value="expert"<span class="tag">&gt;</span>Expert — professional handler<span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;/select&gt;</span>
+
+  <span class="tag">&lt;textarea</span>
+    name="notes"
+    <span class="attr">toolparamdescription</span>=<span class="val">"Optional notes about the adopter's household, other pets, allergies, or special requirements"</span>
+  <span class="tag">&gt;&lt;/textarea&gt;</span>
+
+  <span class="tag">&lt;button</span> type="submit"<span class="tag">&gt;</span>Confirm Adoption<span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;/form&gt;</span></pre>
+            </div><!-- /accordion-inner: Declarative Tool Markup -->
+        </div><!-- /accordion-body -->
+    </div><!-- /accordion-item: Declarative Tool Markup -->
+
+</div><!-- /container -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  ALIEN DATA (shared with index.html)
+// ═══════════════════════════════════════════════════
+
+const ALIENS = [
+    {
+        id: "zorb-001", name: "Blinky", species: "Zorbian Puffworm", emoji: "🟣",
+        planet: "Zorbax-7", size: "small", temperament: "gentle", ability: "bioluminescence",
+        price: 450, compatibilityScore: 94, careLevel: "Easy",
+        blurb: "A squishy, glowing companion that purrs in ultraviolet. Perfect for beginners.",
+        diet: "Photon flakes, crushed starlight, occasional moonberry",
+        lifespan: "35 Earth years",
+        warnings: ["Glows brightly at night — may disrupt sleep", "Do not expose to FM radio frequencies"]
+    },
+    {
+        id: "krix-002", name: "Thundermaw", species: "Krixian Howlbeast", emoji: "🔴",
+        planet: "Krixos Prime", size: "large", temperament: "chaotic", ability: "sonic roar",
+        price: 8500, compatibilityScore: 42, careLevel: "Expert",
+        blurb: "A massive predator with a heart of gold (literally — it has a gold organ).",
+        diet: "Raw plasma steak, iron ore nuggets, the occasional asteroid fragment",
+        lifespan: "200+ Earth years",
+        warnings: ["Sonic roar can cause structural damage", "Requires Class-4 containment license", "May eat furniture during bonding phase"]
+    },
+    {
+        id: "flim-003", name: "Puddle", species: "Flimorian Shapeshifter", emoji: "🔵",
+        planet: "Flimora", size: "medium", temperament: "playful", ability: "shapeshifting",
+        price: 3200, compatibilityScore: 78, careLevel: "Moderate",
+        blurb: "A liquid-bodied trickster that mimics household objects for fun.",
+        diet: "Distilled nebula water, mineral supplements, any Earth liquid (prefers orange juice)",
+        lifespan: "80 Earth years",
+        warnings: ["May impersonate important objects (keys, phones, remotes)", "Cannot hold shape if startled", "Keep away from extreme heat — will evaporate temporarily"]
+    },
+    {
+        id: "vex-004", name: "Whisper", species: "Vexari Thoughtfox", emoji: "🟡",
+        planet: "Vexar Minor", size: "small", temperament: "gentle", ability: "telepathy",
+        price: 6000, compatibilityScore: 88, careLevel: "Easy",
+        blurb: "A fox-like empath that communicates through projected emotions and images.",
+        diet: "Thought-enriched kibble, Vexari dream nectar, chamomile tea",
+        lifespan: "50 Earth years",
+        warnings: ["May project your embarrassing memories if anxious", "Sensitive to loud arguments"]
+    },
+    {
+        id: "grak-005", name: "Crunchwing", species: "Grakkian Crystalbeetle", emoji: "🟢",
+        planet: "Grakka", size: "medium", temperament: "independent", ability: "crystal generation",
+        price: 1800, compatibilityScore: 71, careLevel: "Easy",
+        blurb: "A crystalline insectoid that grows decorative gems on its shell. Low maintenance.",
+        diet: "Assorted gravel, mineral dust, UV light exposure (2 hrs/day minimum)",
+        lifespan: "120 Earth years",
+        warnings: ["Shed crystals may scratch hardwood floors", "Loud crunching sounds at night"]
+    },
+    {
+        id: "neb-006", name: "Nimbus", species: "Nebulan Cloudling", emoji: "⚪",
+        planet: "Nebula Drift", size: "small", temperament: "gentle", ability: "weather control",
+        price: 4200, compatibilityScore: 85, careLevel: "Easy",
+        blurb: "A floating, cloud-like being that generates tiny indoor weather patterns.",
+        diet: "Atmospheric moisture, humidity, the occasional spritz from a spray bottle",
+        lifespan: "Unknown (oldest recorded: 300+ years)",
+        warnings: ["May cause indoor rain if neglected", "Keep away from open flames", "Electronics may need waterproofing"]
+    },
+    {
+        id: "vol-007", name: "Inferno Jr.", species: "Volcanite Salamander", emoji: "🟠",
+        planet: "Krixos Prime", size: "medium", temperament: "chaotic", ability: "fire breath",
+        price: 5500, compatibilityScore: 53, careLevel: "Advanced",
+        blurb: "A fiery reptilian with a mischievous streak and a taste for charcoal.",
+        diet: "Charcoal, lava rocks, any food item (will self-char before eating)",
+        lifespan: "90 Earth years",
+        warnings: ["Fire hazard — fireproof habitat required", "Will char unattended clothing", "Insurance surcharge may apply"]
+    },
+    {
+        id: "zyn-008", name: "Glitch", species: "Zynari Phase-Cat", emoji: "🟣",
+        planet: "Zynara", size: "small", temperament: "playful", ability: "phasing",
+        price: 7200, compatibilityScore: 66, careLevel: "Advanced",
+        blurb: "A cat-like entity that can phase through solid matter. Yes, walls included.",
+        diet: "Standard cat food (weirdly), quantum kibble supplement, the occasional moth",
+        lifespan: "45 Earth years",
+        warnings: ["Cannot be contained by physical barriers", "May appear in your bed at 3 AM", "Phase-proof rooms available for purchase separately"]
+    },
+    {
+        id: "pax-009", name: "Mossworth", species: "Paxian Treeling", emoji: "🟤",
+        planet: "Paxia Verdant", size: "large", temperament: "gentle", ability: "plant growth",
+        price: 250, compatibilityScore: 97, careLevel: "Easy",
+        blurb: "A slow-moving, tree-like companion that accelerates plant growth around it.",
+        diet: "Water, compost, sunlight, classical music (not food but they insist)",
+        lifespan: "500+ Earth years",
+        warnings: ["Very slow — may block hallways", "Accelerated plant growth may affect property", "Produces 3kg of moss daily"]
+    },
+    {
+        id: "xel-010", name: "Axiom", species: "Xelari Hivemind Sprite", emoji: "🔵",
+        planet: "Xelara", size: "small", temperament: "independent", ability: "duplication",
+        price: 12000, compatibilityScore: 58, careLevel: "Expert",
+        blurb: "A tiny entity that splits into up to 12 copies. You're adopting a swarm.",
+        diet: "Electromagnetic energy (sits near routers/outlets), crystallized logic cubes (included)",
+        lifespan: "Unknown — may be functionally immortal",
+        warnings: ["Up to 12 copies at once — can be overwhelming", "Rearranges furniture without asking", "Has been known to optimize your schedule without consent"]
+    }
+];
+
+
+// ═══════════════════════════════════════════════════
+//  PAGE INITIALIZATION
+// ═══════════════════════════════════════════════════
+
+const params = new URLSearchParams(window.location.search);
+const alienId = params.get('id');
+const alien = ALIENS.find(a => a.id === alienId);
+
+function getColor(alien) {
+    const colors = {
+        'Zorbax-7':      'rgba(139,92,246,0.25)',
+        'Krixos Prime':  'rgba(248,113,113,0.25)',
+        'Flimora':       'rgba(59,130,246,0.25)',
+        'Vexar Minor':   'rgba(251,191,36,0.25)',
+        'Grakka':        'rgba(52,211,153,0.25)',
+        'Nebula Drift':  'rgba(200,200,220,0.2)',
+        'Zynara':        'rgba(167,139,250,0.25)',
+        'Paxia Verdant': 'rgba(101,163,13,0.25)',
+        'Xelara':        'rgba(34,211,238,0.25)'
+    };
+    return colors[alien.planet] || 'rgba(99,102,241,0.2)';
+}
+
+const recapCard = document.getElementById('recapCard');
+const formSection = document.getElementById('formSection');
+const successCard = document.getElementById('successCard');
+const errorCard = document.getElementById('errorCard');
+
+if (!alien) {
+    // Invalid or missing ID
+    recapCard.style.display = 'none';
+    formSection.style.display = 'none';
+    errorCard.style.display = 'block';
+} else {
+    // Populate the recap card
+    const illustrationFile = alien.name.toLowerCase().replace(/\s+/g, '-').replace(/\./g, '');
+    recapCard.style.setProperty('--hero-color', getColor(alien));
+    recapCard.innerHTML = `
+        <div class="recap-card-visual">
+            <img src="illustrations/${illustrationFile}.svg" alt="${alien.name}" class="recap-card-illustration">
+        </div>
+        <div class="recap-card-info">
+            <div class="recap-title-row">
+                <h1>${alien.name}</h1>
+                <span class="recap-price">&#8372;${alien.price.toLocaleString()}</span>
+            </div>
+            <div class="recap-species">${alien.species}</div>
+        </div>
+    `;
+
+    // Set hidden alien ID field
+    document.getElementById('alienIdField').value = alien.id;
+
+
+    // Show warnings if any
+    if (alien.warnings && alien.warnings.length > 0) {
+        document.getElementById('warningsSection').innerHTML = `
+            <div class="warnings">
+                <h4><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1.5L10 9.5H1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="5.5" y1="4.5" x2="5.5" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5.5" cy="8" r="0.6" fill="currentColor"/></svg> Before submitting, please be aware:</h4>
+                <ul>${alien.warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+            </div>
+        `;
+    }
+
+    // Handle form submission
+    document.getElementById('adoptionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        // Generate confirmation
+        const adoptionId = 'ADOPT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const pickupDate = new Date(Date.now() + 3 * 86400000).toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+        });
+
+        // If this was triggered by an agent, respond with structured data
+        if (e.agentInvoked && typeof e.respondWith === 'function') {
+            e.respondWith(JSON.stringify({
+                status: "confirmed",
+                adoptionId: adoptionId,
+                alien: alien.name,
+                species: alien.species,
+                adopterName: data.adopter_name,
+                pickupDate: pickupDate,
+                pickupLocation: "Cosmic Companions HQ — Docking Bay 7"
+            }));
+        }
+
+        // Hide form, show success
+        formSection.style.display = 'none';
+        recapCard.style.display = 'none';
+        document.querySelector('.back-link').style.display = 'none';
+        document.querySelector('.hero-content h1').textContent = 'Adoption Confirmed!';
+
+        successCard.style.setProperty('--hero-color', getColor(alien));
+        successCard.innerHTML = `
+            <div class="success-top">
+                <h2>Congratulations, ${data.adopter_name}!<br>${alien.name} the ${alien.species} is officially yours.</h2>
+            </div>
+            <div class="success-middle">
+                <div class="success-visual">
+                    <img src="illustrations/${illustrationFile}.svg" alt="${alien.name}" class="success-illustration">
+                </div>
+                <div class="success-details">
+                    <div class="success-detail-row">
+                        <span class="sdl">adoption id</span>
+                        <span class="sdv">${adoptionId}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">companion</span>
+                        <span class="sdv">${alien.name}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">species</span>
+                        <span class="sdv">${alien.species}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">adopter</span>
+                        <span class="sdv">${data.adopter_name}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">email</span>
+                        <span class="sdv">${data.adopter_email}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">pickup date</span>
+                        <span class="sdv">${pickupDate}</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">pickup location</span>
+                        <span class="sdv">Docking Bay 7</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span class="sdl">care package</span>
+                        <span class="sdv">Included</span>
+                    </div>
+                </div>
+            </div>
+            <div class="success-actions">
+                <a href="index.html" class="btn-primary">Adopt Another Pet</a>
+            </div>
+        `;
+        successCard.classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        launchConfetti(getConfettiColors(alien));
+    });
+}
+
+function getConfettiColors(alien) {
+    const palettes = {
+        'Zorbax-7':      ['#8B5CF6', '#A78BFA', '#C4B5FD', '#EDE9FE', '#ffffff'],
+        'Krixos Prime':  ['#F87171', '#EF4444', '#FCA5A5', '#FECACA', '#ffffff'],
+        'Flimora':       ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#ffffff'],
+        'Vexar Minor':   ['#FBB724', '#FCD34D', '#FDE68A', '#FFF9B2', '#ffffff'],
+        'Grakka':        ['#34D399', '#6EE7B7', '#10B981', '#A7F3D0', '#ffffff'],
+        'Nebula Drift':  ['#C8C8DC', '#94A3B8', '#CBD5E1', '#E2E8F0', '#ffffff'],
+        'Zynara':        ['#A78BFA', '#C4B5FD', '#DDD6FE', '#8B5CF6', '#ffffff'],
+        'Paxia Verdant': ['#65A30D', '#84CC16', '#A3E635', '#BEF264', '#ffffff'],
+        'Xelara':        ['#22D3EE', '#67E8F9', '#06B6D4', '#A5F3FC', '#ffffff'],
+    };
+    return palettes[alien.planet] || ['#FFF9B2', '#8B5CF6', '#34D399', '#22D3EE', '#ffffff'];
+}
+
+function launchConfetti(colors) {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999';
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    function drawStar(ctx, r) {
+        const inner = r * 0.4;
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+            const radius = i % 2 === 0 ? r : inner;
+            const angle = (i * Math.PI) / 5 - Math.PI / 2;
+            if (i === 0) ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            else ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    const particles = Array.from({ length: 130 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * canvas.height * 0.6,
+        r: 4 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.14,
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: 1.8 + Math.random() * 3,
+        opacity: 1
+    }));
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = 0;
+        for (const p of particles) {
+            if (p.y > canvas.height + 20) continue;
+            alive++;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotationSpeed;
+            p.opacity = p.y > canvas.height * 0.65
+                ? Math.max(0, 1 - (p.y - canvas.height * 0.65) / (canvas.height * 0.35))
+                : 1;
+            ctx.save();
+            ctx.globalAlpha = p.opacity;
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.fillStyle = p.color;
+            drawStar(ctx, p.r);
+            ctx.restore();
+        }
+        if (alive > 0) requestAnimationFrame(animate);
+        else canvas.remove();
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+// ═══════════════════════════════════════════════════
+//  TOOL CALL LOG
+// ═══════════════════════════════════════════════════
+
+const logEntriesEl = document.getElementById('logEntries');
+let logCount = 0;
+
+function addLog(toolName, detail) {
+    if (logCount === 0) logEntriesEl.innerHTML = '';
+    logCount++;
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-tool">${toolName}</span>
+        <span class="log-arrow">←</span>
+        ${detail ? `<span class="log-params">${detail}</span>` : ''}
+    `;
+    logEntriesEl.appendChild(entry);
+    logEntriesEl.scrollTop = logEntriesEl.scrollHeight;
+}
+
+// ─── Hero: cursor-tracked star glow (JS lerp, no CSS transition) ──
+(function () {
+    const hero = document.querySelector('.page-hero');
+    if (!hero) return;
+
+    let current = 50;
+    let target  = 50;
+    let rafId   = null;
+
+    function tick() {
+        current += (target - current) * 0.08;
+        hero.style.setProperty('--glow-x', current.toFixed(2) + '%');
+        if (Math.abs(current - target) > 0.05) {
+            rafId = requestAnimationFrame(tick);
+        } else {
+            rafId = null;
+        }
+    }
+
+    function startLerp() {
+        if (!rafId) rafId = requestAnimationFrame(tick);
+    }
+
+    hero.addEventListener('mousemove', function (e) {
+        const rect = hero.getBoundingClientRect();
+        const raw = (e.clientX - rect.left) / rect.width;
+        target = 30 + raw * 40;
+        startLerp();
+    });
+
+    hero.addEventListener('mouseleave', function () {
+        target = 50;
+        startLerp();
+    });
+}());
+
+// ─── Shared starfield initialiser ─────────────────────
+function initStarfield(canvas) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const stars = [];
+
+    function init() {
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        stars.length  = 0;
+        for (let i = 0; i < 110; i++) {
+            stars.push({
+                x:           Math.random() * canvas.width,
+                y:           Math.random() * canvas.height,
+                r:           Math.random() * 1.33 + 0.24,
+                baseOpacity: Math.random() * 0.55 + 0.2,
+                speed:       Math.random() * 0.0008 + 0.0004,
+                phase:       Math.random() * Math.PI * 2
+            });
+        }
+    }
+
+    function draw(t) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(function (s) {
+            const op = s.baseOpacity * (0.4 + 0.6 * Math.sin(t * s.speed + s.phase));
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,' + op.toFixed(3) + ')';
+            ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+
+    init();
+    requestAnimationFrame(draw);
+    window.addEventListener('resize', init);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initStarfield(document.querySelector('.hero-stars'));
+    initStarfield(document.querySelector('.footer-stars'));
+});
+
+// ─── Accordion toggles ────────────────────────────────
+document.querySelectorAll('.accordion-header').forEach(function (header) {
+    header.addEventListener('click', function () {
+        const item = this.closest('.accordion-item');
+        const opening = !item.classList.contains('open');
+        item.classList.toggle('open', opening);
+        this.setAttribute('aria-expanded', opening);
+    });
+});
+
+function clearLog() {
+    logCount = 0;
+    logEntriesEl.innerHTML = '<div class="log-empty">No tool calls yet. Use an agent to interact with this form.</div>';
+}
+
+// Detect when fields get filled (by agent or human) and log it
+const adoptionForm = document.getElementById('adoptionForm');
+
+if (adoptionForm) {
+    const fields = adoptionForm.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    const lastKnown = {};
+    fields.forEach(f => { lastKnown[f.name] = f.value; });
+
+    // Check for value changes every 500ms
+    const poll = setInterval(() => {
+        fields.forEach(f => {
+            if (f.value !== lastKnown[f.name]) {
+                addLog('field_filled', `${f.name} → "${f.value}"`);
+                lastKnown[f.name] = f.value;
+            }
+        });
+    }, 500);
+
+    // Log when form is submitted
+    adoptionForm.addEventListener('submit', () => {
+        clearInterval(poll);
+        const data = Object.fromEntries(new FormData(adoptionForm).entries());
+        addLog('form_submitted', JSON.stringify(data, null, 2));
+    });
+}
+</script>
+
+<footer class="page-footer">
+    <canvas class="footer-stars"></canvas>
+    <svg class="footer-horizon" viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="footer-stroke-glow" x="-20%" y="-200%" width="140%" height="500%">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        <path class="horizon-mask" d="M0,30 Q720,190 1440,30 L1440,0 L0,0 Z"/>
+        <path d="M0,30 Q720,190 1440,30" fill="none" stroke="rgba(180,180,180,0.45)" stroke-width="1" filter="url(#footer-stroke-glow)"/>
+    </svg>
+    <div class="footer-content">
+        <p>Created with <a href="https://www.claude.ai" target="_blank" rel="noopener">Claude</a> + <a href="https://www.paper.design" target="_blank" rel="noopener">Paper</a></p>
+        <p>Anna Grace Bayliss</p>
+        <p>2026</p>
+    </div>
+</footer>
+
+</body>
+</html>

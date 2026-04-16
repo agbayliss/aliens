@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Companions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Strait&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="after/styles.css">
+    <style>
+        .landing-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 64px;
+        }
+
+        .landing-container h1 {
+            margin-bottom: 48px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .landing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .landing-card-visual {
+            height: 200px;
+            background: linear-gradient(145deg, #1a1a2e, var(--bg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .placeholder-shape {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border);
+            opacity: 0.4;
+        }
+
+        .landing-card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .landing-card-body h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .landing-card-body p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .landing-card-body .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="landing-container">
+
+    <h1>Cosmic Companions Redesign</h1>
+
+    <div class="cards">
+
+        <div class="landing-card">
+            <div class="landing-card-visual">
+                <div class="placeholder-shape"></div>
+            </div>
+            <div class="landing-card-body">
+                <h2>Before</h2>
+                <p>Vibe coded with Claude, no visual instruction or design input.</p>
+                <a href="before/index.html" class="btn-primary">View Before</a>
+            </div>
+        </div>
+
+        <div class="landing-card">
+            <div class="landing-card-visual">
+                <div class="placeholder-shape"></div>
+            </div>
+            <div class="landing-card-body">
+                <h2>After</h2>
+                <p>Redesigned with Claude Code + Paper over three days.</p>
+                <a href="after/index.html" class="btn-primary">View After</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
