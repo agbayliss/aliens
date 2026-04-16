@@ -8,10 +8,20 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Strait&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="after/styles.css">
     <style>
+        @media (min-width: 601px) {
+            body {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+        }
+
         .landing-container {
             max-width: 900px;
             margin: 0 auto;
-            padding-top: 64px;
+            width: 100%;
         }
 
         .landing-container h1 {
@@ -91,6 +101,9 @@
         @media (max-width: 600px) {
             .cards {
                 grid-template-columns: 1fr;
+            }
+            .landing-container {
+                padding-top: 48px;
             }
         }
     </style>
