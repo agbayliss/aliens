@@ -16,24 +16,32 @@
 
         .landing-container h1 {
             margin-bottom: 48px;
+            text-align: center;
         }
 
         .cards {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 48px;
         }
 
         .landing-card {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 32px;
         }
 
         .landing-card-visual {
             aspect-ratio: 1 / 1;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(180, 180, 200, 0.15);
+            border: 1px solid var(--border-selected);
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+        }
+
+        .landing-card-visual.is-tilting {
+            transition: none;
         }
 
         .landing-card-visual img {
@@ -47,23 +55,37 @@
         .landing-card-body {
             display: flex;
             flex-direction: column;
-            gap: 12px;
         }
 
         .landing-card-body h2 {
             font-size: 1.25rem;
             font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .landing-card-body p {
             font-size: 0.875rem;
             color: var(--text-muted);
             line-height: 1.6;
+            margin-bottom: 12px;
         }
 
-        .landing-card-body .btn-primary {
-            width: 100%;
-            justify-content: center;
+        .landing-card-body .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8125rem;
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-family: var(--sans);
+        }
+
+        .landing-card-body .card-link:hover { color: var(--text); }
+
+        .landing-card-body .card-link svg {
+            width: 16px;
+            height: 16px;
         }
 
         @media (max-width: 600px) {
@@ -82,24 +104,24 @@
     <div class="cards">
 
         <div class="landing-card">
-            <div class="landing-card-visual">
+            <a href="before/index.html" class="landing-card-visual">
                 <img src="before-img.png" alt="Before redesign screenshot">
-            </div>
+            </a>
             <div class="landing-card-body">
                 <h2>Before</h2>
                 <p>Vibe coded with Claude, no visual instruction or design input.</p>
-                <a href="before/index.html" class="btn-primary">View Before</a>
+                <a href="before/index.html" class="card-link">View Before <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
         </div>
 
         <div class="landing-card">
-            <div class="landing-card-visual">
+            <a href="after/index.html" class="landing-card-visual">
                 <img src="after-img.png" alt="After redesign screenshot">
-            </div>
+            </a>
             <div class="landing-card-body">
                 <h2>After</h2>
                 <p>Redesigned with Claude Code + Paper over three days.</p>
-                <a href="after/index.html" class="btn-primary">View After</a>
+                <a href="after/index.html" class="card-link">View After <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
         </div>
 
@@ -107,5 +129,26 @@
 
 </div>
 
+<script>
+    const MAX_TILT = 4;
+    const PERSPECTIVE = 800;
+
+    document.querySelectorAll('.landing-card-visual').forEach(el => {
+        el.style.perspective = `${PERSPECTIVE}px`;
+
+        el.addEventListener('mousemove', e => {
+            const rect = el.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width  - 0.5;
+            const y = (e.clientY - rect.top)  / rect.height - 0.5;
+            el.classList.add('is-tilting');
+            el.style.transform = `perspective(${PERSPECTIVE}px) rotateY(${x * MAX_TILT}deg) rotateX(${-y * MAX_TILT}deg)`;
+        });
+
+        el.addEventListener('mouseleave', () => {
+            el.classList.remove('is-tilting');
+            el.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg)';
+        });
+    });
+</script>
 </body>
 </html>
