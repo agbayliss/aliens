@@ -420,6 +420,8 @@ if (!alien) {
     document.getElementById('adoptionForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        window.goatcounter?.count({ path: 'adoption-submitted', event: true });
+
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
 
@@ -746,6 +748,9 @@ if (adoptionForm) {
         <p>2026</p>
     </div>
 </footer>
+
+<script data-goatcounter="https://agbayliss.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 
 </body>
 </html>
