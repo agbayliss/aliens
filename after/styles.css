@@ -1437,7 +1437,7 @@ input[type="hidden"] {
     .page-hero--slim {
         height: 260px;
         padding-bottom: 50px;
-        margin-bottom: -1px;
+        margin-bottom: -3px;
     }
 
     /* adopt.html — recap card */
