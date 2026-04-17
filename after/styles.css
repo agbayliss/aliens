@@ -438,6 +438,7 @@ pre .cm   { color: var(--comment); }
     position: relative;
     margin: -40px -20px 0;
     overflow: hidden;
+    clip-path: inset(0); /* belt-and-suspenders clip for iOS WebKit — overflow:hidden alone can fail to clip ::before after keyboard/resize repaints */
     height: 420px;
     background: var(--bg-deep);
     transform: translateZ(0); /* promote to GPU layer so canvas sublayer seam is contained */
@@ -1437,7 +1438,6 @@ input[type="hidden"] {
     .page-hero--slim {
         height: 260px;
         padding-bottom: 50px;
-        margin-bottom: -3px;
     }
 
     /* adopt.html — recap card */
