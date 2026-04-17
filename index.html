@@ -8,6 +8,27 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Strait&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="after/styles.css">
     <style>
+        :root {
+            --bg:              #f5f3ef;
+            --bg-deep:         #ece9e3;
+            --surface:         #eceae5;
+            --surface-hover:   #e2dfd9;
+            --border:          #c8c4bc;
+            --border-focus:    #3a3835;
+            --border-selected: #6b6761;
+            --border-hover:    #3a3835;
+            --text:            #1e1c1a;
+            --text-muted:      #6b6761;
+            --accent:          #1e1c1a;
+            --accent-soft:     rgba(30, 28, 26, 0.08);
+            --accent-glow:     rgba(30, 28, 26, 0.06);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+
         @media (min-width: 601px) {
             body {
                 min-height: 100vh;
@@ -44,7 +65,8 @@
         .landing-card-visual {
             aspect-ratio: 1 / 1;
             overflow: hidden;
-            border: 1px solid var(--border-selected);
+            border: none;
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.14);
             transform-style: preserve-3d;
             will-change: transform;
             transition: transform 0.6s ease, box-shadow 0.6s ease;
@@ -77,10 +99,10 @@
             font-size: 0.875rem;
             color: var(--text-muted);
             line-height: 1.6;
-            margin-bottom: 12px;
+            margin-bottom: 0;
         }
 
-        .landing-card-body .card-link {
+        .card-link {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -91,11 +113,16 @@
             font-family: var(--sans);
         }
 
-        .landing-card-body .card-link:hover { color: var(--text); }
+        .card-link:hover { color: var(--text); }
 
-        .landing-card-body .card-link svg {
+        .card-link svg {
             width: 16px;
             height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .card-link:hover svg {
+            transform: translateX(4px);
         }
 
         @media (max-width: 600px) {
@@ -117,25 +144,25 @@
     <div class="cards">
 
         <div class="landing-card">
-            <a href="before/index.html" class="landing-card-visual">
-                <img src="before-img.png" alt="Before redesign screenshot">
-            </a>
             <div class="landing-card-body">
                 <h2>Before</h2>
                 <p>Vibe coded with Claude, no visual instruction or design input.</p>
-                <a href="before/index.html" class="card-link">View Before <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
+            <a href="before/index.html" class="landing-card-visual">
+                <img src="before-img.png" alt="Before redesign screenshot">
+            </a>
+            <a href="before/index.html" class="card-link">View Before <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
 
         <div class="landing-card">
+            <div class="landing-card-body">
+                <h2>After</h2>
+                <p>Redesigned with Claude Code + Paper in three days.</p>
+            </div>
             <a href="after/index.html" class="landing-card-visual">
                 <img src="after-img.png" alt="After redesign screenshot">
             </a>
-            <div class="landing-card-body">
-                <h2>After</h2>
-                <p>Redesigned with Claude Code + Paper over three days.</p>
-                <a href="after/index.html" class="card-link">View After <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-            </div>
+            <a href="after/index.html" class="card-link">View After <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
 
     </div>
