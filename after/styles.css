@@ -456,9 +456,8 @@ pre .cm   { color: var(--comment); }
 .page-hero::before {
     content: '';
     position: absolute;
-    left: var(--glow-x, 50%);
+    left: calc(var(--glow-x, 50%) - 750px);
     bottom: -60px;
-    transform: translateX(-50%);
     width: 1500px;
     height: 700px;
     background: radial-gradient(ellipse at 50% 100%,
